@@ -92,10 +92,22 @@ class HomeViewController: UIViewController {
         image = image?.withRenderingMode(.alwaysOriginal)
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image, style: .done, target: self, action: nil)
         navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil),
+            UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: #selector(handleAccountButtonTapped)),
             UIBarButtonItem(image: UIImage(systemName: "play.rectangle"), style: .done, target: self, action: nil)
         ]
         navigationController?.navigationBar.tintColor = .white
+    }
+    
+    @objc private func handleAccountButtonTapped() {
+        let vc = SettingsViewController()
+        let navVC = UINavigationController(rootViewController: vc)
+        navVC.isModalInPresentation = true
+        	//        if let sheet = navVC.sheetPresentationController {
+//            sheet.detents = [.large(), .large()]
+//        }
+        
+        navigationController?.present(navVC, animated: true)
+
     }
     
     override func viewDidLayoutSubviews() {
@@ -105,6 +117,7 @@ class HomeViewController: UIViewController {
     
     @objc private func handleRefreshControl() {
         self.homeFeedTable.reloadData()
+        self.configureHeroHeaderView()
         
         DispatchQueue.main.async {
             self.homeFeedTable.refreshControl?.endRefreshing()

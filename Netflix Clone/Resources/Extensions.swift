@@ -12,3 +12,11 @@ extension String {
         return "\(self.prefix(1).uppercased())\(self.lowercased().dropFirst())"
     }
 }
+
+extension NSObject {
+    var className: String {
+        get {
+            return NSStringFromClass(type(of: self))
+        }
+    }
+}

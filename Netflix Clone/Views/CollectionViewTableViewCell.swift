@@ -14,6 +14,7 @@ protocol CollectionViewTableViewCellDelegate: AnyObject {
 class CollectionViewTableViewCell: UITableViewCell {
     static let identifier = "CollectionViewTableViewCell"
     private var titles: [Title] = []
+    private var downloading: Bool = false
     
     weak var delegate: CollectionViewTableViewCellDelegate?
     
@@ -53,14 +54,24 @@ class CollectionViewTableViewCell: UITableViewCell {
     }
     
     private func downloadTitleAt(indexPath: IndexPath) {
+        guard
+            !self.downloading
+        else {
+            return
+        }
+        
+        self.downloading = true
+           
         DataPersistenceManager.shared.downloadTitle(width: titles[indexPath.row]) { result in
             switch result {
             case .success():
                 // sends the signal
                 NotificationCenter.default.post(name: NSNotification.Name("downloaded"), object: nil)
                 print("Downloaded to Database")
+                self.downloading = false
             case .failure(let error):
                 print(error.localizedDescription)
+                self.downloading = false
             }
         }
     }

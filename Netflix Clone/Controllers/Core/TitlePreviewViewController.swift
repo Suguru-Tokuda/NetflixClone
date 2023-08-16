@@ -10,6 +10,7 @@ import WebKit
 
 class TitlePreviewViewController: UIViewController {
     private var previewTitle: Title?
+    private var downloading: Bool = false
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -90,23 +91,29 @@ class TitlePreviewViewController: UIViewController {
         self.titleLabel.text = model.title
         self.overviewLabel.text = model.titleOverview
         self.previewTitle = title
-        
         guard let url = URL(string: "https://www.youtube.com/embed/\(model.youtubeView.id.videoId)") else { return }
         
-        self.webView.load(URLRequest(url: url))
+        DispatchQueue.main.async {
+            self.webView.load(URLRequest(url: url))
+        }
     }
     
     @objc func handleDownloadBtnTapped() {
         guard
-            let title = previewTitle
+            let title = previewTitle,
+            self.downloading == false
         else { return }
+        
+        self.downloading = true
         DataPersistenceManager.shared.downloadTitle(width: title) { result in
             switch result {
             case .success():
                 NotificationCenter.default.post(name: NSNotification.Name("downloaded"), object: nil)
                 print("Downloaded to Database")
+                self.downloading = false
             case .failure(let error):
                 print(error.localizedDescription)
+                self.downloading = false
             }
         }
     }
